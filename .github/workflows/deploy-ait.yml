@@ -1,0 +1,33 @@
+name: deploy-ait
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy-ait:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Build Apps in Toss artifact
+        run: npx ait build
+
+      - name: Deploy to Apps in Toss
+        run: npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
