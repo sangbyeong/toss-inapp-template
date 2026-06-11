@@ -42,12 +42,13 @@ README 기준으로 사용자가 직접 수정해야 하는 파일만 바꿔서 
 
 ### build-ait
 
-PR 또는 `main` 브랜치 push 후 자동 실행됩니다. 다음 단계가 모두 성공해야 합니다.
+PR 또는 `main` 브랜치 push 후 자동 실행됩니다. 초기 템플릿에는 lockfile이 없으므로 npm cache 없이 `npm install`로 의존성을 설치합니다. 다음 단계가 모두 성공해야 합니다.
 
-1. `npm install`
-2. `npm run build`
-3. `npx ait build`
-4. artifact 업로드
+1. Node.js 20 설정
+2. `npm install`
+3. `npm run build`
+4. `npx ait build`
+5. artifact 업로드
 
 ### deploy-ait
 

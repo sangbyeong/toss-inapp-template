@@ -61,7 +61,7 @@ React + Vite + TypeScript + Apps in Toss WebView SDK 2.x로 만든 **완성형 �
 npm install
 ```
 
-> `npm ci`는 lockfile이 생긴 뒤 CI나 재설치 환경에서 사용하세요.
+> 이 템플릿은 초기 상태에서 lockfile 없이도 GitHub Actions가 동작하도록 `npm install`을 사용합니다. 나중에 `package-lock.json`을 커밋하면 workflow를 `npm ci`와 npm cache 사용 방식으로 바꿔도 됩니다.
 
 ## 2. 앱 정보 입력하기
 
@@ -132,10 +132,11 @@ npx ait build
 
 실행 순서:
 
-1. `npm install`
-2. `npm run build`
-3. `npx ait build`
-4. `.ait` 파일과 `dist` 폴더를 artifact로 업로드
+1. Node.js 20 설정
+2. `npm install`
+3. `npm run build`
+4. `npx ait build`
+5. `.ait` 파일과 `dist` 폴더를 artifact로 업로드
 
 ### 자동 배포
 
