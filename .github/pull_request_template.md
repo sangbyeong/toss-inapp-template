@@ -8,6 +8,12 @@
 - [ ] `src/app.content.ts` 화면 문구와 링크가 서비스 내용과 일치합니다.
 - [ ] 필요한 경우에만 `toss.features.config.ts` 권한/API 기능을 켰습니다.
 
+## 기존 레포에 붙이는 경우
+
+- [ ] 기존 앱 화면과 기능 파일을 통째로 삭제하지 않았습니다.
+- [ ] `package.json`, `src/`, `vite.config.ts`, `tsconfig.*`, `.github/workflows/`는 덮어쓰지 않고 필요한 부분만 병합했습니다.
+- [ ] 충돌 위험이 있는 파일을 바꿨다면 PR 설명에 이유를 적었습니다.
+
 ## secret 확인
 
 - [ ] 코드와 README/문서에 실제 API 키, 토큰, 비밀번호를 넣지 않았습니다.

@@ -4,6 +4,44 @@ React + Vite + TypeScript + Apps in Toss WebView SDK 2.x로 만든 **완성형 �
 처음 사용하는 분도 앱 이름과 화면 문구만 바꿔서 샌드박스 테스트, 빌드, GitHub Actions 배포까지 이어갈 수 있게 구성했습니다.
 
 
+## 이 템플릿을 끌어다 쓰는 가장 쉬운 방법
+
+이 레포는 API 연동용 패키지가 아니라 **오픈소스 스타터 템플릿처럼 새 프로젝트에 끌어다 쓰는 레포**입니다.
+
+가장 쉬운 방식은 GitHub에서 이 레포를 **Template repository**로 설정한 뒤, 새 미니앱을 만들 때 **Use this template** 버튼으로 새 레포를 만드는 것입니다. 그러면 파일 복사나 수동 병합 없이 `build-ait`, `deploy-ait`, Apps in Toss 설정 파일, 문서가 모두 들어간 새 레포가 만들어집니다.
+
+로컬에서 복사하고 싶다면 아래처럼 사용할 수 있습니다.
+
+```bash
+git clone --depth 1 https://github.com/<owner>/toss-inapp-template.git my-toss-miniapp
+cd my-toss-miniapp
+rm -rf .git
+git init
+git add .
+git commit -m "Initialize Apps in Toss miniapp"
+```
+
+가져온 뒤에는 기본적으로 두 파일만 바꾸면 됩니다.
+
+1. `toss.launch.config.ts` — 앱 ID, 표시 이름, 색상, 아이콘
+2. `src/app.content.ts` — 화면 문구와 링크
+
+권한이나 외부 API가 필요할 때만 `toss.features.config.ts`를 추가로 바꾸세요.
+
+## 이미 개발 중인 레포에 붙일 때
+
+이미 개발 중인 앱에 붙일 때는 비개발자가 직접 파일을 복사하거나 덮어쓰지 않는 것을 권장합니다. 기존 앱에는 `package.json`, `src/`, `vite.config.ts`, `.github/workflows/`가 이미 있을 수 있어서 수동 복사는 충돌 위험이 큽니다.
+
+대신 기존 레포에서 Codex에게 **기존 화면과 기능은 유지하고, Apps in Toss 설정과 workflow만 안전하게 병합해 달라**고 요청하세요. 그대로 붙여 넣을 프롬프트와 확인 체크리스트는 [`docs/adopt-existing-repo.md`](docs/adopt-existing-repo.md)에 정리했습니다.
+
+요약하면 다음 순서입니다.
+
+1. 기존 레포에서 새 브랜치를 만든다.
+2. `docs/adopt-existing-repo.md`의 Codex 프롬프트를 붙여 넣는다.
+3. Codex가 만든 PR에서 삭제된 기존 파일이 없는지 확인한다.
+4. GitHub Actions `build-ait`가 성공하면 merge한다.
+5. 배포할 때만 `AIT_API_KEY`를 GitHub Secrets에 등록하고 `deploy-ait`를 실행한다.
+
 ## Codex만으로 출시하는 빠른 흐름
 
 로컬 개발 환경이 없어도 GitHub에서 Codex와 협업해 출시할 수 있도록 구성했습니다.
@@ -43,7 +81,8 @@ React + Vite + TypeScript + Apps in Toss WebView SDK 2.x로 만든 **완성형 �
 ├── toss.features.config.ts  # 권한/API 기능 스위치
 ├── granite.config.ts        # Apps in Toss 빌드 설정으로 변환하는 내부 파일
 ├── docs/
-│   └── codex-release-guide.md # Codex만으로 출시하는 절차
+│   ├── codex-release-guide.md # Codex만으로 출시하는 절차
+│   └── adopt-existing-repo.md # 기존 레포에 붙이는 절차
 └── .github/workflows/
     ├── build-ait.yml
     └── deploy-ait.yml
@@ -172,6 +211,10 @@ npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
 ### Cloudflare, Supabase, Firebase를 바로 쓸 수 있나요?
 
 기본 템플릿에는 포함하지 않았습니다. 필요한 프로젝트에서 별도로 추가하세요.
+
+### 이미 개발 중인 레포에도 붙일 수 있나요?
+
+네. 다만 비개발자가 직접 파일을 덮어쓰기보다 Codex에게 안전 병합을 맡기는 방식을 권장합니다. 자세한 프롬프트와 체크리스트는 `docs/adopt-existing-repo.md`를 보세요.
 
 ### 로컬 개발 환경 없이도 출시할 수 있나요?
 

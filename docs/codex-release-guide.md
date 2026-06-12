@@ -2,6 +2,23 @@
 
 이 문서는 로컬 개발 환경 없이 **GitHub + Codex + GitHub Actions**만으로 템플릿을 수정하고 Apps in Toss에 업로드하는 흐름을 설명합니다.
 
+## 사용하는 방식
+
+이 템플릿은 API로 끌어오는 라이브러리가 아니라 **새 Apps in Toss 미니앱 레포의 시작점**입니다.
+
+추천 방식은 다음 중 하나입니다.
+
+1. GitHub의 **Use this template**로 새 레포를 만든다.
+2. 또는 `git clone --depth 1`로 복사한 뒤 `.git`을 지우고 새 레포로 초기화한다.
+
+그다음 Codex에게 앱별 값만 바꾸라고 요청하면 됩니다. 사용자가 직접 관리할 기본 파일은 `toss.launch.config.ts`와 `src/app.content.ts`이고, 권한/API가 필요할 때만 `toss.features.config.ts`를 수정합니다.
+
+## 이미 개발 중인 레포라면
+
+새 레포가 아니라 기존 앱에 붙이는 경우에는 직접 파일을 덮어쓰지 마세요. `package.json`, `src/`, `vite.config.ts`, `.github/workflows/`가 충돌할 수 있습니다.
+
+비개발자는 `docs/adopt-existing-repo.md`의 프롬프트를 Codex에게 붙여 넣고, PR에서 `build-ait`가 성공하는지만 확인하는 방식을 권장합니다.
+
 ## 전체 흐름
 
 1. Apps in Toss 콘솔에서 앱을 만든다.
