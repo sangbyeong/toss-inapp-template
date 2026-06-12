@@ -1,0 +1,29 @@
+{
+  "name": "toss-inapp-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "build:ait": "npx ait build",
+    "deploy:ait": "npx ait deploy --api-key $AIT_API_KEY",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@apps-in-toss/web-framework": "^2.1.0",
+    "@emotion/react": "^11.11.4",
+    "@toss/tds-mobile": "^2.2.0",
+    "@toss/tds-mobile-ait": "^2.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.0"
+  }
+}
