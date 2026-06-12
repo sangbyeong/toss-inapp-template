@@ -19,6 +19,7 @@
 ## secret 확인
 
 - [ ] 코드와 README/문서에 실제 API 키, 토큰, 비밀번호를 넣지 않았습니다.
+- [ ] `@apps-in-toss/cli`를 `package.json`에 추가하지 않았고, CLI는 `npx ait ...`로만 실행합니다.
 - [ ] 배포가 필요하면 GitHub Secrets에 `AIT_API_KEY`를 등록했습니다.
 
 ## 출시 체크

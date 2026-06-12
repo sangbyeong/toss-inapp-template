@@ -69,6 +69,10 @@
 - 실제 secret은 코드에 넣지 말고 .env.local 또는 GitHub Secrets만 쓰게 해줘.
 - Cloudflare, Supabase, Firebase는 기본 추가하지 마.
 - Apps in Toss 관련 구현은 AX MCP가 가능하면 공식 문서와 예제를 먼저 확인해줘.
+- Apps in Toss WebView SDK 의존성은 @apps-in-toss/web-framework 2.x만 추가해줘. 현재 공식 SDK 2.x 기준 버전은 2.4.1이야.
+- @apps-in-toss/cli는 package.json dependencies/devDependencies에 추가하지 마. CLI는 npx ait build, npx ait deploy처럼 npx ait로만 실행해줘.
+- @apps-in-toss/web-framework를 0.x 또는 1.x로 낮추지 마.
+- 패키지가 설치되지 않는다고 임시 타입 선언 파일로 import 오류를 숨기지 마. npm registry/proxy 403이면 환경 문제로 보고 PR 설명에 남겨줘.
 - 변경 후 build-ait workflow가 npm install, npm run build, npx ait build를 실행하게 해줘.
 - deploy-ait workflow는 npx ait deploy --api-key ${{ secrets.AIT_API_KEY }} 방식으로 배포하게 해줘.
 - 충돌 위험이 있는 파일은 왜 바꿨는지 PR 설명에 적어줘.
@@ -170,6 +174,27 @@ npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
 접근이 안 되면 어떤 파일이 필요한지 목록을 알려줘.
 기존 레포 파일은 덮어쓰지 말고 필요한 설정만 병합해줘.
 ```
+
+## 자주 생기는 문제와 원인
+
+### `@apps-in-toss/cli`를 추가했다면
+
+문제입니다. Apps in Toss CLI는 프로젝트 의존성으로 `@apps-in-toss/cli`를 추가하는 방식이 아니라 `npx ait ...`로 실행합니다. `package.json`에는 `@apps-in-toss/web-framework` 2.x만 Apps in Toss WebView SDK 의존성으로 둡니다.
+
+### `@apps-in-toss/web-framework` 버전을 0.x나 1.x로 낮췄다면
+
+문제입니다. 이 템플릿은 Apps in Toss WebView SDK 2.x 기준입니다. 공식 SDK 2.x 마이그레이션 문서 기준 WebView 패키지는 `@apps-in-toss/web-framework@2.4.1`입니다.
+
+### Codex 환경에서 `npm install`이 403으로 실패했다면
+
+항상 코드 문제는 아닙니다. Codex 실행 환경, 회사망, 프록시, registry 정책이 `@apps-in-toss/*` scoped package 조회를 막을 수 있습니다. 이 경우 PR에서 GitHub Actions `build-ait`를 실행해 실제 GitHub runner에서도 실패하는지 확인하세요.
+
+- GitHub Actions `build-ait`가 성공하면 템플릿 통합은 정상입니다.
+- GitHub Actions에서도 403이면 registry/proxy/패키지 접근 정책 문제입니다. Apps in Toss 또는 네트워크 관리자에게 `@apps-in-toss/web-framework`와 `ait` CLI 접근 허용을 요청해야 합니다.
+
+### 아이콘을 파일로 첨부했다면
+
+`granite.config.ts`의 brand icon에는 최종적으로 공개 HTTPS 이미지 URL이 필요합니다. Codex가 `public/icons/...`에 임시 파일을 저장할 수는 있지만, 출시 전에는 앱인토스 콘솔 또는 공개 정적 호스팅 URL로 바꿔야 합니다.
 
 ## 실패했을 때 Codex에게 다시 요청하는 말
 

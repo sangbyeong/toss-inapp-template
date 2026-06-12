@@ -39,6 +39,7 @@ git commit -m "Initialize Apps in Toss miniapp"
 1. 기존 앱 레포에 collaborator 또는 멤버 권한이 있어야 합니다. private 레포는 권한이 없으면 Codex가 읽거나 PR을 만들 수 없습니다.
 2. 프롬프트에는 `toss-inapp-template`라는 이름만 쓰지 말고 `https://github.com/sangbyeong/toss-inapp-template`처럼 전체 URL을 넣으세요.
 3. `AIT_API_KEY`는 앱인토스 콘솔에서 워크스페이스 선택 후 좌측 메뉴 **키**에서 발급하고, GitHub 레포의 **Settings → Secrets and variables → Actions**에 `AIT_API_KEY` 이름으로 저장합니다.
+4. Apps in Toss CLI 패키지를 직접 추가하지 마세요. `@apps-in-toss/cli`를 `package.json`에 넣지 않고 `npx ait build`, `npx ait deploy`만 사용합니다.
 
 요약하면 다음 순서입니다.
 
@@ -225,6 +226,10 @@ npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
 ### 로컬 개발 환경 없이도 출시할 수 있나요?
 
 네. Codex가 PR을 만들고 GitHub Actions가 `build-ait`와 `deploy-ait`를 실행하는 구조입니다. 자세한 단계는 `docs/codex-release-guide.md`를 확인하세요.
+
+### npm install에서 @apps-in-toss 패키지가 403으로 실패하면 어떻게 하나요?
+
+먼저 코드 문제와 네트워크 문제를 나눠 보세요. `@apps-in-toss/cli`를 `package.json`에 추가했다면 제거해야 합니다. Apps in Toss WebView SDK 의존성은 `@apps-in-toss/web-framework` 2.x이고, CLI는 `npx ait ...`로 실행합니다. 그래도 Codex 환경에서만 403이 나면 프록시/registry 정책 문제일 수 있으므로 GitHub Actions `build-ait`에서 다시 확인하세요. GitHub Actions에서도 403이면 `@apps-in-toss/*`와 `ait` CLI 접근 허용이 필요합니다.
 
 ### Apps in Toss 공식 문서는 어디에서 보나요?
 
