@@ -34,6 +34,12 @@ git commit -m "Initialize Apps in Toss miniapp"
 
 대신 기존 레포에서 Codex에게 **기존 화면과 기능은 유지하고, Apps in Toss 설정과 workflow만 안전하게 병합해 달라**고 요청하세요. 그대로 붙여 넣을 프롬프트와 확인 체크리스트는 [`docs/adopt-existing-repo.md`](docs/adopt-existing-repo.md)에 정리했습니다.
 
+처음 GitHub를 쓰는 사람은 아래만 기억하면 됩니다.
+
+1. 기존 앱 레포에 collaborator 또는 멤버 권한이 있어야 합니다. private 레포는 권한이 없으면 Codex가 읽거나 PR을 만들 수 없습니다.
+2. 프롬프트에는 `toss-inapp-template`라는 이름만 쓰지 말고 `https://github.com/sangbyeong/toss-inapp-template`처럼 전체 URL을 넣으세요.
+3. `AIT_API_KEY`는 앱인토스 콘솔에서 워크스페이스 선택 후 좌측 메뉴 **키**에서 발급하고, GitHub 레포의 **Settings → Secrets and variables → Actions**에 `AIT_API_KEY` 이름으로 저장합니다.
+
 요약하면 다음 순서입니다.
 
 1. 기존 레포에서 새 브랜치를 만든다.

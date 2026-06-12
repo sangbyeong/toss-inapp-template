@@ -17,7 +17,7 @@
 
 새 레포가 아니라 기존 앱에 붙이는 경우에는 직접 파일을 덮어쓰지 마세요. `package.json`, `src/`, `vite.config.ts`, `.github/workflows/`가 충돌할 수 있습니다.
 
-비개발자는 `docs/adopt-existing-repo.md`의 프롬프트를 Codex에게 붙여 넣고, PR에서 `build-ait`가 성공하는지만 확인하는 방식을 권장합니다.
+비개발자는 `docs/adopt-existing-repo.md`의 프롬프트를 Codex에게 붙여 넣고, PR에서 `build-ait`가 성공하는지만 확인하는 방식을 권장합니다. 기존 private 레포라면 작업하는 GitHub 계정이 collaborator 또는 조직 멤버 권한을 가져야 합니다. 템플릿을 찾게 할 때는 레포 이름만 쓰지 말고 `https://github.com/sangbyeong/toss-inapp-template`처럼 전체 URL을 함께 적어 주세요.
 
 ## 전체 흐름
 
