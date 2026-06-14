@@ -1,0 +1,40 @@
+name: deploy-ait
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-ait:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Build Apps in Toss artifact
+        run: npx ait build
+
+      - name: Check AIT API key
+        env:
+          AIT_API_KEY: ${{ secrets.AIT_API_KEY }}
+        run: |
+          if [ -z "$AIT_API_KEY" ]; then
+            echo "::error::AIT_API_KEY is required"
+            exit 1
+          fi
+
+      - name: Deploy to Apps in Toss
+        env:
+          AIT_API_KEY: ${{ secrets.AIT_API_KEY }}
+        run: npx ait deploy --api-key "$AIT_API_KEY"
