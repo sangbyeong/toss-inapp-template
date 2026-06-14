@@ -39,7 +39,8 @@ git commit -m "Initialize Apps in Toss miniapp"
 1. 기존 앱 레포에 collaborator 또는 멤버 권한이 있어야 합니다. private 레포는 권한이 없으면 Codex가 읽거나 PR을 만들 수 없습니다.
 2. 프롬프트에는 `toss-inapp-template`라는 이름만 쓰지 말고 `https://github.com/sangbyeong/toss-inapp-template`처럼 전체 URL을 넣으세요.
 3. `AIT_API_KEY`는 앱인토스 콘솔에서 워크스페이스 선택 후 좌측 메뉴 **키**에서 발급하고, GitHub 레포의 **Settings → Secrets and variables → Actions**에 `AIT_API_KEY` 이름으로 저장합니다.
-4. Apps in Toss CLI 패키지를 직접 추가하지 마세요. `@apps-in-toss/cli`를 `package.json`에 넣지 않고 `npx ait build`, `npx ait deploy`만 사용합니다.
+4. 기존 Cloudflare/Vercel/Firebase/Netlify 배포 설정은 AIT 기준으로 바꾸지 말고, AIT artifact 생성과 배포는 `build-ait`/`deploy-ait`에서만 실행하세요.
+5. Apps in Toss CLI 패키지를 직접 추가하지 마세요. 기본 방식은 `@apps-in-toss/cli`를 `package.json`에 넣지 않고 `npx ait build`, `npx ait deploy`만 사용하는 것입니다. 단, `npm error could not determine executable to run`이 발생하면 `docs/ci-notes.md`의 fallback을 확인하세요.
 
 요약하면 다음 순서입니다.
 
@@ -89,7 +90,8 @@ git commit -m "Initialize Apps in Toss miniapp"
 ├── granite.config.ts        # Apps in Toss 빌드 설정으로 변환하는 내부 파일
 ├── docs/
 │   ├── codex-release-guide.md # Codex만으로 출시하는 절차
-│   └── adopt-existing-repo.md # 기존 레포에 붙이는 절차
+│   ├── adopt-existing-repo.md # 기존 레포에 붙이는 절차
+│   └── ci-notes.md # 기존 외부 배포와 AIT workflow 분리 원칙
 └── .github/workflows/
     ├── build-ait.yml
     └── deploy-ait.yml
@@ -174,7 +176,7 @@ npx ait build
 
 ### 자동 빌드
 
-`.github/workflows/build-ait.yml`은 pull request, `main` 브랜치 push, 수동 실행에서 동작합니다.
+`.github/workflows/build-ait.yml`은 기본적으로 수동 실행(`workflow_dispatch`) 전용입니다. 기존 웹 배포와 AIT artifact 생성을 섞지 않기 위해 pull request, `main` push, tag push에는 자동 연결하지 않는 것을 권장합니다.
 
 실행 순서:
 
@@ -186,7 +188,7 @@ npx ait build
 
 ### 자동 배포
 
-`.github/workflows/deploy-ait.yml`은 수동 실행 또는 `v*` 태그 push에서 동작합니다.
+`.github/workflows/deploy-ait.yml`은 기본적으로 수동 실행(`workflow_dispatch`) 전용입니다. 배포 전에 `AIT_API_KEY` secret이 없으면 workflow가 먼저 `AIT_API_KEY is required` 오류를 출력합니다.
 
 먼저 GitHub 저장소에서 `AIT_API_KEY` secret을 등록하세요.
 
@@ -227,9 +229,13 @@ npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
 
 네. Codex가 PR을 만들고 GitHub Actions가 `build-ait`와 `deploy-ait`를 실행하는 구조입니다. 자세한 단계는 `docs/codex-release-guide.md`를 확인하세요.
 
+### 기존 외부 배포와 AIT 배포를 같이 묶어도 되나요?
+
+권장하지 않습니다. Cloudflare Pages, Vercel, Firebase, Netlify 같은 기존 웹 배포의 build command, output directory, deploy command는 그대로 두고, AIT artifact 생성과 배포는 GitHub Actions의 `build-ait`/`deploy-ait` 수동 workflow에서만 실행하세요. 자세한 내용은 `docs/ci-notes.md`를 확인하세요.
+
 ### npm install에서 @apps-in-toss 패키지가 403으로 실패하면 어떻게 하나요?
 
-먼저 코드 문제와 네트워크 문제를 나눠 보세요. `@apps-in-toss/cli`를 `package.json`에 추가했다면 제거해야 합니다. Apps in Toss WebView SDK 의존성은 `@apps-in-toss/web-framework` 2.x이고, CLI는 `npx ait ...`로 실행합니다. 그래도 Codex 환경에서만 403이 나면 프록시/registry 정책 문제일 수 있으므로 GitHub Actions `build-ait`에서 다시 확인하세요. GitHub Actions에서도 403이면 `@apps-in-toss/*`와 `ait` CLI 접근 허용이 필요합니다.
+먼저 코드 문제와 네트워크 문제를 나눠 보세요. Apps in Toss WebView SDK 의존성은 `@apps-in-toss/web-framework` 2.x이고, 기본 CLI 실행은 `npx ait ...`입니다. 그래도 Codex 환경에서만 403이 나면 프록시/registry 정책 문제일 수 있으므로 GitHub Actions `build-ait`에서 다시 확인하세요. GitHub Actions에서도 403이면 `@apps-in-toss/*`와 `ait` CLI 접근 허용이 필요합니다. `npm error could not determine executable to run`이 발생하면 `docs/ci-notes.md`의 wrapper fallback을 참고하세요.
 
 ### Apps in Toss 공식 문서는 어디에서 보나요?
 

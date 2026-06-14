@@ -41,9 +41,10 @@
 2. 새 브랜치를 만든다. 예: `add-apps-in-toss-template`
 3. Codex에게 아래 프롬프트를 그대로 붙여 넣는다.
 4. Codex가 만든 PR에서 변경 파일을 확인한다.
-5. GitHub Actions `build-ait`가 성공하는지 확인한다.
-6. 문제가 없으면 merge한다.
-7. 배포할 때만 GitHub Secrets에 `AIT_API_KEY`를 등록하고 `deploy-ait`를 실행한다.
+5. `build-ait`가 수동 실행 전용인지 확인한다.
+6. GitHub Actions에서 `build-ait`를 수동 실행해 성공하는지 확인한다.
+7. 문제가 없으면 merge한다.
+8. 배포할 때만 GitHub Secrets에 `AIT_API_KEY`를 등록하고 `deploy-ait`를 수동 실행한다.
 
 ## Codex에게 붙여 넣을 프롬프트
 
@@ -68,9 +69,15 @@
 - 권한/API는 toss.features.config.ts에서만 선택적으로 켜게 해줘.
 - 실제 secret은 코드에 넣지 말고 .env.local 또는 GitHub Secrets만 쓰게 해줘.
 - Cloudflare, Supabase, Firebase는 기본 추가하지 마.
+- 기존 Cloudflare Pages/Vercel/Firebase/Netlify 배포 설정의 build command, output directory, deploy command를 AIT 기준으로 바꾸지 마.
+- 기존 웹 배포 workflow와 AIT workflow를 합치지 마. AIT artifact 생성은 build-ait/deploy-ait에서만 실행해줘.
+- build-ait와 deploy-ait는 workflow_dispatch 수동 실행 전용으로 만들어줘. pull_request, push, tag push에 자동 연결하지 마.
+- Cloudflare Pages Git 연동을 쓰는 앱이면 Pages 설정에 npx wrangler deploy를 넣지 마.
+- API base URL은 공개 변수로만 주입하고, secret은 클라이언트 번들에 넣지 마.
 - Apps in Toss 관련 구현은 AX MCP가 가능하면 공식 문서와 예제를 먼저 확인해줘.
 - Apps in Toss WebView SDK 의존성은 @apps-in-toss/web-framework 2.x만 추가해줘. 현재 공식 SDK 2.x 기준 버전은 2.4.1이야.
-- @apps-in-toss/cli는 package.json dependencies/devDependencies에 추가하지 마. CLI는 npx ait build, npx ait deploy처럼 npx ait로만 실행해줘.
+- 기본 방식에서는 @apps-in-toss/cli를 package.json dependencies/devDependencies에 추가하지 마. CLI는 npx ait build, npx ait deploy처럼 npx ait로 실행해줘.
+- 단, npx ait build/deploy가 `npm error could not determine executable to run`으로 실패하면 docs/ci-notes.md의 wrapper fallback을 적용해도 돼. 이 경우 @apps-in-toss/cli는 fallback devDependency라고 PR 설명에 적어줘.
 - @apps-in-toss/web-framework를 0.x 또는 1.x로 낮추지 마.
 - 패키지가 설치되지 않는다고 임시 타입 선언 파일로 import 오류를 숨기지 마. npm registry/proxy 403이면 환경 문제로 보고 PR 설명에 남겨줘.
 - 변경 후 build-ait workflow가 npm install, npm run build, npx ait build를 실행하게 해줘.
@@ -119,8 +126,9 @@ README.md
 - [ ] `toss.launch.config.ts`가 생겼고 앱 이름/색상/아이콘을 넣을 수 있다.
 - [ ] `src/app.content.ts`가 생겼거나 기존 화면 구조에 맞게 문구 설정 파일이 연결되었다.
 - [ ] `toss.features.config.ts`가 생겼고 권한/API가 기본 꺼짐 상태다.
-- [ ] `.github/workflows/build-ait.yml`이 있다.
-- [ ] `.github/workflows/deploy-ait.yml`이 있다.
+- [ ] `.github/workflows/build-ait.yml`이 있고 `workflow_dispatch` 수동 실행 전용이다.
+- [ ] `.github/workflows/deploy-ait.yml`이 있고 `workflow_dispatch` 수동 실행 전용이다.
+- [ ] 기존 Cloudflare/Vercel/Firebase/Netlify 배포 설정이 AIT 기준으로 바뀌지 않았다.
 - [ ] 코드에 API 키, 토큰, 비밀번호가 들어가지 않았다.
 - [ ] PR의 GitHub Actions `build-ait`가 성공했다.
 
@@ -185,6 +193,10 @@ npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
 
 문제입니다. 이 템플릿은 Apps in Toss WebView SDK 2.x 기준입니다. 공식 SDK 2.x 마이그레이션 문서 기준 WebView 패키지는 `@apps-in-toss/web-framework@2.4.1`입니다.
 
+### `npx ait build`가 `could not determine executable to run`으로 실패했다면
+
+기본 방식은 `npx ait build`입니다. 다만 일부 환경에서 npm이 실행 파일을 찾지 못하면 `docs/ci-notes.md`의 wrapper fallback을 사용하세요. 이때만 `@apps-in-toss/cli`를 devDependency로 추가하고 `scripts/ait.mjs`에서 `initialize()`를 호출합니다.
+
 ### Codex 환경에서 `npm install`이 403으로 실패했다면
 
 항상 코드 문제는 아닙니다. Codex 실행 환경, 회사망, 프록시, registry 정책이 `@apps-in-toss/*` scoped package 조회를 막을 수 있습니다. 이 경우 PR에서 GitHub Actions `build-ait`를 실행해 실제 GitHub runner에서도 실패하는지 확인하세요.
@@ -195,6 +207,25 @@ npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
 ### 아이콘을 파일로 첨부했다면
 
 `granite.config.ts`의 brand icon에는 최종적으로 공개 HTTPS 이미지 URL이 필요합니다. Codex가 `public/icons/...`에 임시 파일을 저장할 수는 있지만, 출시 전에는 앱인토스 콘솔 또는 공개 정적 호스팅 URL로 바꿔야 합니다.
+
+## Cloudflare Pages 기존 앱 주의사항
+
+Cloudflare Pages를 이미 쓰는 앱에 붙일 때는 다음을 지키세요.
+
+- Pages Git 연동의 build command를 AIT 명령으로 바꾸지 않습니다.
+- Pages Git 연동에 `npx wrangler deploy`를 넣지 않습니다.
+- Cloudflare 일반 웹 배포와 AIT workflow를 합치지 않습니다.
+- 정적 `public` + Pages Functions 구조라면 Cloudflare output directory와 AIT output은 별개로 관리합니다.
+- API base URL은 `GADAK_API_BASE_URL` 같은 공개 변수로만 주입하고, secret은 클라이언트 번들에 넣지 않습니다.
+
+## 다음 작업자에게 전달할 체크리스트
+
+- [ ] 기존 앱 파일이 삭제되지 않았는지 확인했습니다.
+- [ ] 기존 Cloudflare/Vercel/Firebase/Netlify 배포 workflow나 provider 설정이 AIT 기준으로 바뀌지 않았습니다.
+- [ ] `build-ait`와 `deploy-ait`가 `workflow_dispatch` 수동 실행 전용입니다.
+- [ ] `AIT_API_KEY` GitHub Secret이 필요한 레포에 등록되어 있습니다.
+- [ ] `npx ait`가 실패했다면 wrapper fallback 사용 여부와 이유가 PR 설명에 적혀 있습니다.
+- [ ] 실제 secret 값이 코드, 문서, PR 설명에 들어가지 않았습니다.
 
 ## 실패했을 때 Codex에게 다시 요청하는 말
 

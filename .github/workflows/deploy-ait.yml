@@ -2,9 +2,6 @@ name: deploy-ait
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 jobs:
   deploy-ait:
@@ -28,5 +25,16 @@ jobs:
       - name: Build Apps in Toss artifact
         run: npx ait build
 
+      - name: Check AIT API key
+        env:
+          AIT_API_KEY: ${{ secrets.AIT_API_KEY }}
+        run: |
+          if [ -z "$AIT_API_KEY" ]; then
+            echo "::error::AIT_API_KEY is required"
+            exit 1
+          fi
+
       - name: Deploy to Apps in Toss
-        run: npx ait deploy --api-key ${{ secrets.AIT_API_KEY }}
+        env:
+          AIT_API_KEY: ${{ secrets.AIT_API_KEY }}
+        run: npx ait deploy --api-key "$AIT_API_KEY"

@@ -24,9 +24,9 @@
 1. Apps in Toss 콘솔에서 앱을 만든다.
 2. Codex에게 `toss.launch.config.ts`와 `src/app.content.ts` 수정을 요청한다.
 3. 권한이나 외부 API가 필요하면 Codex에게 `toss.features.config.ts` 수정도 요청한다.
-4. Codex가 PR을 만들면 GitHub Actions의 `build-ait` 결과를 확인한다.
+4. Codex가 PR을 만들면 GitHub Actions에서 `build-ait`를 수동 실행해 결과를 확인한다.
 5. GitHub Secrets에 `AIT_API_KEY`를 등록한다.
-6. `deploy-ait` workflow를 수동 실행하거나 `v*` 태그를 push해 업로드한다.
+6. `deploy-ait` workflow를 수동 실행해 업로드한다.
 
 ## 사용자가 준비해야 하는 값
 
@@ -55,11 +55,15 @@ README 기준으로 사용자가 직접 수정해야 하는 파일만 바꿔서 
 클립보드 쓰기 권한만 켜줘. 다른 권한과 외부 API는 기본값 그대로 꺼둬.
 ```
 
+## 기존 외부 배포와 AIT 분리
+
+기존 운영 앱에 붙일 때는 Cloudflare Pages, Vercel, Firebase, Netlify의 build command, output directory, deploy command를 AIT 기준으로 바꾸지 마세요. AIT artifact 생성과 배포는 GitHub Actions의 `build-ait`, `deploy-ait` 수동 workflow에서만 실행하세요. 자세한 내용은 `docs/ci-notes.md`를 확인하세요.
+
 ## GitHub Actions에서 확인할 것
 
 ### build-ait
 
-PR 또는 `main` 브랜치 push 후 자동 실행됩니다. 초기 템플릿에는 lockfile이 없으므로 npm cache 없이 `npm install`로 의존성을 설치합니다. 다음 단계가 모두 성공해야 합니다.
+`build-ait`는 기본적으로 수동 실행 전용입니다. 기존 Cloudflare/Vercel/Firebase/Netlify 같은 외부 웹 배포와 AIT artifact 생성을 섞지 않기 위해 PR, `main` push, tag push에는 자동 연결하지 않는 것을 권장합니다. 초기 템플릿에는 lockfile이 없으므로 npm cache 없이 `npm install`로 의존성을 설치합니다. 다음 단계가 모두 성공해야 합니다.
 
 1. Node.js 20 설정
 2. `npm install`
@@ -85,6 +89,6 @@ PR 또는 `main` 브랜치 push 후 자동 실행됩니다. 초기 템플릿에�
 - [ ] `src/app.content.ts`의 문구와 링크가 서비스에 맞다.
 - [ ] `toss.features.config.ts`에서 필요한 권한만 켰다.
 - [ ] 코드에 API 키, 토큰, 비밀번호 같은 secret이 없다.
-- [ ] GitHub Actions의 `build-ait`가 성공했다.
+- [ ] GitHub Actions의 `build-ait`가 수동 실행 전용이고 성공했다.
 - [ ] GitHub Secrets에 `AIT_API_KEY`가 등록되어 있다.
-- [ ] `deploy-ait` workflow가 성공했다.
+- [ ] `deploy-ait` workflow가 수동 실행 전용이고 성공했다.
